@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: restic-backup
+  namespace: your-ns  # Change me
+spec:
+  concurrencyPolicy: Forbid
+  schedule: "12 2 * * *"  # Change me if needed (02:12 daily)
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: restic
+            image: restic/restic:latest
+            args:
+              - backup
+              - /data
+            env:
+              - name: RESTIC_REPOSITORY
+                valueFrom:
+                  secretKeyRef:
+                    name: b2-keys
+                    key: bucketName
+                    optional: false
+              - name: RESTIC_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: b2-keys
+                    key: resticKey
+                    optional: false
+              - name: B2_ACCOUNT_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: b2-keys
+                    key: keyID
+                    optional: false
+              - name: B2_ACCOUNT_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: b2-keys
+                    key: applicationKey
+                    optional: false
+            volumeMounts:
+              - name: backupdata
+                mountPath: /data
+                readOnly: true
+          volumes:
+            - name: backupdata
+              persistentVolumeClaim:
+                claimName: your-pvc  # Change me
+          restartPolicy: OnFailure

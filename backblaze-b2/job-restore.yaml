@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: restic-restore
+  namespace: your-ns  # change me
+spec:
+  template:
+    spec:
+      containers:      
+      - image: restic/restic:latest
+        imagePullPolicy: IfNotPresent
+        name: restic
+        args:
+        - restore
+        - latest  # change me, if needed, to restore different snapshot
+        - --target
+        - /data
+        env:
+        - name: RESTIC_REPOSITORY
+          valueFrom:
+            secretKeyRef:
+              name: b2-keys
+              key: bucketName
+              optional: false
+        - name: RESTIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: resticKey
+              name: b2-keys
+              optional: false
+        - name: B2_ACCOUNT_ID
+          valueFrom:
+            secretKeyRef:
+              key: keyID
+              name: b2-keys
+              optional: false
+        - name: B2_ACCOUNT_KEY
+          valueFrom:
+            secretKeyRef:
+              key: applicationKey
+              name: b2-keys
+              optional: false
+        volumeMounts:
+        - mountPath: /data
+          name: backupdata
+      restartPolicy: OnFailure
+      volumes:
+      - name: backupdata
+        persistentVolumeClaim:
+          claimName: your-pvc  # change me
