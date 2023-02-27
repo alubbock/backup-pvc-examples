@@ -44,12 +44,4 @@ spec:
                     name: b2-keys
                     key: applicationKey
                     optional: false
-            volumeMounts:
-              - name: backupdata
-                mountPath: /data
-                readOnly: true
-          volumes:
-            - name: backupdata
-              persistentVolumeClaim:
-                claimName: your-pvc  # change me
           restartPolicy: OnFailure

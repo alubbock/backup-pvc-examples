@@ -44,12 +44,4 @@ spec:
                     name: s3-keys
                     key: secretAccessKey
                     optional: false
-            volumeMounts:
-              - name: backupdata
-                mountPath: /data
-                readOnly: true
-          volumes:
-            - name: backupdata
-              persistentVolumeClaim:
-                claimName: your-pvc  # change me
           restartPolicy: OnFailure
