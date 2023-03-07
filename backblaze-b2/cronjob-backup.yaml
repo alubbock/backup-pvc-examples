@@ -13,11 +13,12 @@ spec:
           containers:
           - name: restic
             image: restic/restic:latest
+            workingDir: /data
             args:
               - backup
               - --host
               - kubernetes  # set a consistent hostname to avoid restic rescans
-              - /data
+              - .           # use workingDir to set path
             env:
               - name: RESTIC_REPOSITORY
                 valueFrom:
